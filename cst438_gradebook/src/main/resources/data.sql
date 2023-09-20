@@ -9,6 +9,7 @@ INSERT INTO course (year, semester, course_id, title, instructor)  VALUES
 (2020,'Fall',31747,'CST 238 - Introduction to Data Structures','jgross@csumb.edu')
 ;
 
+
 insert into assignment (id, due_date, name, course_id) values 
 (1, '2021-09-01', 'db design', 31045),
 (2, '2021-09-02', 'requirements', 31045)
