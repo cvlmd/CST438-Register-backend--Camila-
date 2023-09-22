@@ -32,8 +32,8 @@ public class Assignment {
     public int getId() {
         return id;
     }
-    public void setId(int id) {
-        this.id = id;
+    public void setId(long id2) {
+        this.id = (int) id2;
     }
     public String getName() {
         return name;
