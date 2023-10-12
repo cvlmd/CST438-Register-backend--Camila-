@@ -21,7 +21,6 @@ INSERT INTO course (year, semester, course_id, title, instructor) VALUES
 -- Updating the assignment table
 
 INSERT INTO assignment (id, due_date, name, course_id) VALUES
-
 (1, '2021-09-01', 'db design', 31045),
 
 (2, '2021-09-02', 'requirements', 31045);
