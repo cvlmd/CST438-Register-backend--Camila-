@@ -1,4 +1,4 @@
-CREATE TABLE course (
+CREATE TABLE course (   
   course_id int NOT NULL,
   instructor varchar(255) DEFAULT NULL,
   semester varchar(255) DEFAULT NULL,

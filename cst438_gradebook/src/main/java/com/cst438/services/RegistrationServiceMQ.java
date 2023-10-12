@@ -21,60 +21,72 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ConditionalOnProperty(prefix = "registration", name = "service", havingValue = "mq")
 public class RegistrationServiceMQ implements RegistrationService {
 
-	@Autowired
-	EnrollmentRepository enrollmentRepository;
+    @Autowired
+    EnrollmentRepository enrollmentRepository;
 
-	@Autowired
-	CourseRepository courseRepository;
+    @Autowired
+    CourseRepository courseRepository;
 
-	@Autowired
-	private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
-	public RegistrationServiceMQ() {
-		System.out.println("MQ registration service ");
-	}
+    public RegistrationServiceMQ() {
+        System.out.println("MQ registration service ");
+    }
 
 
-	Queue registrationQueue = new Queue("registration-queue", true);
+    Queue registrationQueue = new Queue("registration-queue", true);
 
-	/*
-	 * Receive message for student added to course
-	 */
-	@RabbitListener(queues = "gradebook-queue")
-	@Transactional
-	public void receive(String message) {
-		
-		System.out.println("Gradebook has received: "+message);
+    /*
+     * Receive message for student added to course
+     */
+    @RabbitListener(queues = "gradebook-queue")
+    @Transactional
+    public void receive(String message) {
+        System.out.println("Gradebook has received: " + message);
 
-		//TODO  deserialize message to EnrollmentDTO and update database
-	}
+        try {
+            // Deserialize the message to EnrollmentDTO
+            EnrollmentDTO enrollmentDTO = fromJsonString(message, EnrollmentDTO.class);
 
-	/*
-	 * Send final grades to Registration Service 
-	 */
-	@Override
-	public void sendFinalGrades(int course_id, FinalGradeDTO[] grades) {
-		 
-		System.out.println("Start sendFinalGrades "+course_id);
+            // Update the database with the enrollmentDTO data
+            enrollmentRepository.save(enrollmentDTO.toEnrollment());
 
-		//TODO convert grades to JSON string and send to registration service
-		
-	}
-	
-	private static String asJsonString(final Object obj) {
-		try {
-			return new ObjectMapper().writeValueAsString(obj);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
+            System.out.println("Enrollment updated in the database.");
+        } catch (Exception e) {
+            System.err.println("Error deserializing and updating the database: " + e.getMessage());
+        }
+    }
 
-	private static <T> T  fromJsonString(String str, Class<T> valueType ) {
-		try {
-			return new ObjectMapper().readValue(str, valueType);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
+    /*
+     * Send final grades to Registration Service 
+     */
+    @Override
+    public void sendFinalGrades(int course_id, FinalGradeDTO[] grades) {
+         
+        System.out.println("Start sendFinalGrades "+course_id);
+
+        String gradesJson = asJsonString(grades);
+
+        // Envoyer la chaîne JSON au service d'inscription
+        rabbitTemplate.convertAndSend(registrationQueue.getName(), gradesJson);
+        
+    }
+    
+    private static String asJsonString(final Object obj) {
+        try {
+            return new ObjectMapper().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static <T> T  fromJsonString(String str, Class<T> valueType ) {
+        try {
+            return new ObjectMapper().readValue(str, valueType);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }
