@@ -12,8 +12,11 @@ import com.cst438.services.RegistrationServiceREST;
 @SpringBootApplication
 public class Cst438GradebookApplication  {
 
-	public static void main(String[] args) throws InterruptedException {
-		SpringApplication.run(Cst438GradebookApplication.class, args);
-	}
+    public static void main(String[] args) throws InterruptedException {
+        SpringApplication.run(Cst438GradebookApplication.class, args);
+    }
+    
+    
+    
 
 }
