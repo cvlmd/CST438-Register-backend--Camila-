@@ -1,5 +1,6 @@
 package com.cst438.controllers;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,9 +35,11 @@ public class AssignmentController {
     CourseRepository courseRepository;
     
     @GetMapping("/assignment")
-    public AssignmentDTO[] getAllAssignmentsForInstructor() {
-        // get all assignments for this instructor
-        String instructorEmail = "dwisneski@csumb.edu";  // user name (should be instructor's email) 
+     public AssignmentDTO[] getAllAssignmentsForInstructor(Principal principal) {
+        // Obtenez l'e-mail de l'instructeur à partir de l'objet Principal
+        String instructorEmail = principal.getName();
+            
+        // Utilisez instructorEmail pour obtenir les affectations de cet instructeur
         List<Assignment> assignments = assignmentRepository.findByEmail(instructorEmail);
         AssignmentDTO[] result = new AssignmentDTO[assignments.size()];
         for (int i=0; i<assignments.size(); i++) {
@@ -53,8 +56,10 @@ public class AssignmentController {
     }
     
     @GetMapping("/assignment/{id}")
-    public AssignmentDTO getAssignment(@PathVariable("id") int id)  {
-        String instructorEmail = "dwisneski@csumb.edu";  // user name (should be instructor's email)
+    public AssignmentDTO getAssignment(@PathVariable("id") int id, Principal principal)  {
+        // Obtenez l'e-mail de l'instructeur à partir de l'objet Principal
+        String instructorEmail = principal.getName();
+
         Assignment a = assignmentRepository.findById(id).orElse(null);
         if (a==null) {
             throw  new ResponseStatusException( HttpStatus.NOT_FOUND, "assignment not found "+id);
@@ -69,9 +74,10 @@ public class AssignmentController {
     }
     
     @PostMapping("/assignment")
-    public int createAssignment(@RequestBody AssignmentDTO adto) {
-        // check that course exists and belongs to this instructor
-        String instructorEmail = "dwisneski@csumb.edu";  // user name (should be instructor's email)
+     public int createAssignment(@RequestBody AssignmentDTO adto, Principal principal) {
+        // Obtenez l'e-mail de l'instructeur à partir de l'objet Principal
+        String instructorEmail = principal.getName();
+        
         Course c = courseRepository.findById(adto.courseId()).orElse(null);
         if (c==null || ! c.getInstructor().equals(instructorEmail)) {
             throw  new ResponseStatusException( HttpStatus.BAD_REQUEST, "course id not found or not authorized "+adto.courseId());
@@ -86,9 +92,10 @@ public class AssignmentController {
     }
     
     @PutMapping("/assignment/{id}")
-    public void updateAssignment(@PathVariable("id") int id, @RequestBody AssignmentDTO adto) {
-        // check assignment belongs to a course for this instructor
-        String instructorEmail = "dwisneski@csumb.edu";  // user name (should be instructor's email)
+    public void updateAssignment(@PathVariable("id") int id, @RequestBody AssignmentDTO adto, Principal principal) {
+        // Obtenez l'e-mail de l'instructeur à partir de l'objet Principal
+        String instructorEmail = principal.getName();
+        
         Assignment a = assignmentRepository.findById(id).orElse(null);
         if (a==null || ! a.getCourse().getInstructor().equals(instructorEmail)) {
             throw  new ResponseStatusException( HttpStatus.NOT_FOUND, "assignment not found or not authorized "+id);
@@ -99,9 +106,10 @@ public class AssignmentController {
     }
     
     @DeleteMapping("/assignment/{id}")
-    public void deleteAssignment(@PathVariable("id") int id, @RequestParam("force") Optional<String> force) {
-        // check assignment belongs to a course for this instructor
-        String instructorEmail = "dwisneski@csumb.edu";  // user name (should be instructor's email)
+     public void deleteAssignment(@PathVariable("id") int id, @RequestParam("force") Optional<String> force, Principal principal) {
+        // Obtenez l'e-mail de l'instructeur à partir de l'objet Principal
+        String instructorEmail = principal.getName();
+        
         Assignment a = assignmentRepository.findById(id).orElse(null);
         if (a==null) {
             return;
