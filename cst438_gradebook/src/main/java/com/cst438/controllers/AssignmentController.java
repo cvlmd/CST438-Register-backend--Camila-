@@ -70,6 +70,7 @@ public class AssignmentController {
         }
         AssignmentDTO adto = new AssignmentDTO(a.getId(), a.getName(), a.getDueDate().toString(), a.getCourse().getTitle(), a.getCourse().getCourse_id());
         return adto;
+        
 
     }
     

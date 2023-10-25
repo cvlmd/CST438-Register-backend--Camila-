@@ -22,4 +22,4 @@ public class AuthEntryPoint implements AuthenticationEntryPoint {
 		PrintWriter writer = response.getWriter();
 		writer.println("Error: " + authException.getMessage());
 	}
-}
+}  

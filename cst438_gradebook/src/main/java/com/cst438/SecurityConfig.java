@@ -76,4 +76,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     Exception {
         return authenticationManager();
     }
-}
+}  
